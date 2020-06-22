@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -88,13 +89,13 @@ public class DialogUtilities {
         return errorDialog;
     }
 
-    public static SweetAlertDialog getRetry(String title) {
+    public static SweetAlertDialog getRetry(String title, WebView webView,String url) {
         NoInternetRetryInteracter noInternetRetryInteracter = (NoInternetRetryInteracter) AppClass.currentAct;
         SweetAlertDialog errorDialog = new SweetAlertDialog(AppClass.currentAct, SweetAlertDialog.WARNING_TYPE)
                 .setTitleText(title)
                 .setConfirmText("RETRY")
                 .setConfirmClickListener(sDialog ->{sDialog.dismissWithAnimation();
-                            noInternetRetryInteracter.retryApiCall();});
+                            noInternetRetryInteracter.retryApiCall(webView,url);});
         return errorDialog;
     }
 

@@ -3,18 +3,24 @@ package com.vanir.in;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.vanir.in.utils.DialogUtilities;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NoInternetRetryInteracter{
 
     Dialog progressBar;
     WebView webView;
+    String failedUrl = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,22 +31,56 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
 
         webView.setWebViewClient(new MyWebViewClient());
-        webView.loadUrl("https://ecommerce.a4aim.com/");
+        if (isNetworkConnected()){
+            webView.loadUrl("https://vanir.in/");
+            progressBar.show();
+        }
+        else {
+            DialogUtilities.getRetry("Please Check Your Internet Connection",webView,"https://vanir.in/").show();
+        }
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        progressBar.show();
+
 
 
     }
 
+    @Override
+    public void retryApiCall(WebView webView2, String url) {
+        webView2.loadUrl(url);
+    }
+
     class MyWebViewClient extends WebViewClient {
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            Log.d("test44","onPageStarted");
+            if (isNetworkConnected()){
+                Log.d("test44","onPageStarted if");
+            }
+            else {
+                Log.d("test44","onPageStarted else");
+                DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+            }
+        }
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-
-            if (!progressBar.isShowing()) {
-                progressBar.show();
+            Log.d("test44","shouldOverrideUrlLoading");
+            if (isNetworkConnected()){
+                Log.d("test44","shouldOverrideUrlLoading if");
+                view.loadUrl(url);
+                if (!progressBar.isShowing()) {
+                    progressBar.show();
+                }
             }
+            else {
+                Log.d("test44","shouldOverrideUrlLoading else");
+                DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+            }
+
+
 
             return true;
         }
@@ -70,6 +110,12 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 }
 
