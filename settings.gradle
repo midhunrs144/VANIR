@@ -1,0 +1,2 @@
+rootProject.name='Vanir'
+include ':app'
