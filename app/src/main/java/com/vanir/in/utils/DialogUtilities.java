@@ -46,7 +46,7 @@ public class DialogUtilities {
 
         View view = AppClass.currentAct.getLayoutInflater().inflate(R.layout.progress_bar, null);
         ImageView imgview  = view.findViewById(R.id.imgViewpb);
-        Glide.with(AppClass.currentAct).load(R.drawable.progressh).into(imgview);
+        Glide.with(AppClass.currentAct).load(R.drawable.spinner).into(imgview);
         dialog.setContentView(view);
         dialog.setCancelable(false);
         Window window = dialog.getWindow();

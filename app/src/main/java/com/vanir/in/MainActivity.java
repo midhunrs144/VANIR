@@ -9,7 +9,10 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -20,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
 
     Dialog progressBar;
     WebView webView;
-    String failedUrl = "";
+    String URL = "https://vanir.in/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,13 +33,24 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         progressBar = DialogUtilities.showProgressBar();
         webView = findViewById(R.id.webView);
 
+
+        webView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+        webView.setLongClickable(false);
+
         webView.setWebViewClient(new MyWebViewClient());
         if (isNetworkConnected()){
-            webView.loadUrl("https://vanir.in/");
+            webView.loadUrl(URL);
             progressBar.show();
+            webView.setVisibility(View.VISIBLE);
         }
         else {
-            DialogUtilities.getRetry("Please Check Your Internet Connection",webView,"https://vanir.in/").show();
+            webView.setVisibility(View.INVISIBLE);
+            DialogUtilities.getRetry("Please Check Your Internet Connection",webView,URL).show();
         }
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
@@ -47,7 +61,15 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
 
     @Override
     public void retryApiCall(WebView webView2, String url) {
-        webView2.loadUrl(url);
+        if (isNetworkConnected()){
+            webView2.loadUrl(URL);
+            progressBar.show();
+            webView2.setVisibility(View.VISIBLE);
+        }
+        else {
+            webView2.setVisibility(View.INVISIBLE);
+            DialogUtilities.getRetry("Please Check Your Internet Connection",webView,URL).show();
+        }
     }
 
     class MyWebViewClient extends WebViewClient {
@@ -61,9 +83,11 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             }
             else {
                 Log.d("test44","onPageStarted else");
-                DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+                //DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+                //Toast.makeText(getApplicationContext(),"Please Check Your Internet Connection",Toast.LENGTH_SHORT).show();
             }
         }
+
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -76,13 +100,24 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
                 }
             }
             else {
-                Log.d("test44","shouldOverrideUrlLoading else");
-                DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+                webView.stopLoading();
+                //DialogUtilities.getRetry("Please Check Your Internet Connection",view,url).show();
+                Toast.makeText(getApplicationContext(),"Please Check Your Internet Connection",Toast.LENGTH_SHORT).show();
             }
 
 
 
             return true;
+        }
+
+
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+            super.onReceivedError(view, request, error);
+            webView.setVisibility(View.INVISIBLE);
+            webView.loadUrl(URL);
+            webView.clearHistory();
+            Log.d("test555","onReceivedError");
         }
 
         @Override
@@ -91,8 +126,12 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             if (progressBar.isShowing()) {
                 progressBar.dismiss();
             }
+            if (isNetworkConnected()){
+                webView.setVisibility(View.VISIBLE);
+            }
 
         }
+
 
     }
     @Override
