@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         progressBar = DialogUtilities.showProgressBar();
         webView = findViewById(R.id.webView);
 
+        webView.clearCache(true);
 
         webView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
             webView.setVisibility(View.INVISIBLE);
-            webView.loadUrl(URL);
+            webView.goBack();
             webView.clearHistory();
             Log.d("test555","onReceivedError");
         }
