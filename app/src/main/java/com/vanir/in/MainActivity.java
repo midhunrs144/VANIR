@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,6 +19,8 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.vanir.in.utils.DialogUtilities;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements NoInternetRetryInteracter{
 
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         webView.setLongClickable(false);
 
         webView.setWebViewClient(new MyWebViewClient());
-        if (isNetworkConnected()){
+        if (isConnected()){
             webView.loadUrl(URL);
             progressBar.show();
             webView.setVisibility(View.VISIBLE);
@@ -62,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
 
     @Override
     public void retryApiCall(WebView webView2, String url) {
-        if (isNetworkConnected()){
+        if (isConnected()){
             webView2.loadUrl(URL);
             progressBar.show();
             webView2.setVisibility(View.VISIBLE);
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             Log.d("test44","onPageStarted");
-            if (isNetworkConnected()){
+            if (isConnected()){
                 Log.d("test44","onPageStarted if");
             }
             else {
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.d("test44","shouldOverrideUrlLoading");
-            if (isNetworkConnected()){
+            if (isConnected()){
                 Log.d("test44","shouldOverrideUrlLoading if");
                 view.loadUrl(url);
                 if (!progressBar.isShowing()) {
@@ -127,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             if (progressBar.isShowing()) {
                 progressBar.dismiss();
             }
-            if (isNetworkConnected()){
+            if (isConnected()){
                 webView.setVisibility(View.VISIBLE);
             }
 
@@ -152,10 +155,17 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         return super.onKeyDown(keyCode, event);
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    public boolean isConnected(){
+        final String command = "ping -c 1 google.com";
+        try {
+            return Runtime.getRuntime().exec(command).waitFor() == 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
 
