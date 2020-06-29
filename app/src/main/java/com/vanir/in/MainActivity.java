@@ -14,6 +14,7 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
 
     Dialog progressBar;
     WebView webView;
+    boolean hasError = false;
     String URL = "https://vanir.in/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +94,10 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             }
         }
 
+        @Override
+        public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+            super.onReceivedHttpError(view, request, errorResponse);
+        }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -119,20 +125,30 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
             webView.setVisibility(View.INVISIBLE);
-            webView.goBack();
-            webView.clearHistory();
+            //webView.goBack();
+            //webView.clearHistory();
+            hasError = true;
             Log.d("test555","onReceivedError");
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             System.out.println("on finish");
-            if (progressBar.isShowing()) {
-                progressBar.dismiss();
-            }
-            if (isConnected()){
+
+            if (isConnected()&&!hasError){
+                if (progressBar.isShowing()) {
+                    progressBar.dismiss();
+                }
                 webView.setVisibility(View.VISIBLE);
+                Log.d("test555","onPageFinished visible");
             }
+            else {
+                //webView.setVisibility(View.VISIBLE);
+                webView.loadUrl(URL);
+                hasError = false;
+                Log.d("test555","onPageFinished home");
+            }
+            Log.d("test555","onPageFinished");
 
         }
 
@@ -145,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
                 case KeyEvent.KEYCODE_BACK:
                     if (webView.canGoBack()) {
                         webView.goBack();
+                        //webView.setVisibility(View.VISIBLE);
                     } else {
                         finish();
                     }
