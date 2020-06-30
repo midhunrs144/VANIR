@@ -1,5 +1,6 @@
 package com.vanir.in;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         }
 
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             //webView.goBack();
             //webView.clearHistory();
             hasError = true;
-            Log.d("test555","onReceivedError");
+            Log.d("test555","onReceivedError "+view.getUrl() + "- "+error.getErrorCode());
         }
 
         @Override
@@ -146,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
                 //webView.setVisibility(View.VISIBLE);
                 webView.loadUrl(URL);
                 hasError = false;
-                Log.d("test555","onPageFinished home");
+                Log.d("test555","onPageFinished has error made false");
             }
-            Log.d("test555","onPageFinished");
+            Log.d("test555","onPageFinished "+ url +"  has error -"+hasError);
 
         }
 
@@ -159,9 +162,13 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_BACK:
+                    if (webView.getUrl().equals(URL)){
+                        finish();
+                    }
                     if (webView.canGoBack()) {
                         webView.goBack();
                         //webView.setVisibility(View.VISIBLE);
+                        Log.d("test555","backPresses ");
                     } else {
                         finish();
                     }
