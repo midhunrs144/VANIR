@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             hasError = true;
             super.onReceivedHttpError(view, request, errorResponse);
 
+            
+
         }
 
         @Override
