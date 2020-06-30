@@ -98,7 +98,13 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
 
         @Override
         public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+            webView.setVisibility(View.INVISIBLE);
+            //webView.goBack();
+            //webView.clearHistory();
+            Log.d("test44","onReceivedHttpError");
+            hasError = true;
             super.onReceivedHttpError(view, request, errorResponse);
+
         }
 
         @Override
@@ -123,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
         }
 
 
-        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
@@ -131,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             //webView.goBack();
             //webView.clearHistory();
             hasError = true;
-            Log.d("test555","onReceivedError "+view.getUrl() + "- "+error.getErrorCode());
+            //Log.d("test555","onReceivedError "+view.getUrl() + "- "+error.getErrorCode());
         }
 
         @Override
