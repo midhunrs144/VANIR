@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             hasError = true;
             super.onReceivedHttpError(view, request, errorResponse);
 
-            
+
 
         }
 
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements NoInternetRetryIn
             }
             else {
                 //webView.setVisibility(View.VISIBLE);
-                webView.loadUrl(URL);
+                view.loadUrl(URL);
                 hasError = false;
                 Log.d("test555","onPageFinished has error made false");
             }
